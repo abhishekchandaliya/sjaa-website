@@ -4,11 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SJAA - Shree Jinendra Architect & Associates</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind Config -->
     <script>
       tailwind.config = {
         theme: {
@@ -28,18 +34,889 @@
         }
       }
     </script>
-    <script type="importmap">
-    {
-      "imports": {
-        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-        "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-        "react/": "https://esm.sh/react@^19.2.3/",
-        "react": "https://esm.sh/react@^19.2.3"
+
+    <!-- Custom Styles -->
+    <style>
+      html, body {
+        font-family: 'Inter', sans-serif;
+        color: #333333;
+        background-color: #ffffff;
+        font-size: 16px; /* Global Elite Standard */
+        scroll-behavior: smooth;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
-    }
-    </script>
+
+      /* Typography Defaults */
+      h1, h2, h3, h4, h5, h6 { margin: 0; }
+
+      /* Animations */
+      .fade-in-up {
+        animation: fadeInUp 1s ease-out forwards;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+      }
+
+      @keyframes fadeInUp {
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .delay-200 { animation-delay: 0.2s; }
+      .delay-400 { animation-delay: 0.4s; }
+
+      /* Search Highlight Styles */
+      .app-highlight {
+        background-color: #2E8B57;
+        color: #000000;
+        padding: 0 2px;
+        border-radius: 2px;
+        transition: all 0.2s ease;
+      }
+
+      .app-highlight.active-match {
+        background-color: #FFA500;
+        color: #000000;
+        box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.4);
+        font-weight: 500;
+      }
+
+      /* Toast Notification */
+      #search-toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background-color: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 100;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      #search-toast.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* Scrollbar Utilities */
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      @media (max-width: 768px) {
+        .container-padding { padding-left: 20px; padding-right: 20px; }
+      }
+    </style>
+
+    <!-- React Dependencies & Babel -->
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.263.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
+  }
+}
+</script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- Main Application Logic -->
+    <script type="text/babel" data-type="module">
+      import React, { useState, useEffect, useRef } from 'react';
+      import { createRoot } from 'react-dom/client';
+      import { 
+        Menu, X, Search, ChevronLeft, ChevronRight, 
+        Shield, Settings, Infinity, ArrowDown, ArrowRight, 
+        ChevronDown, Building2, Landmark, PenTool, 
+        Instagram, Linkedin, Facebook 
+      } from 'lucide-react';
+
+      /**
+       * Header Component
+       */
+      const Header = ({ onNavigate, onSearchSubmit, onSearchClear }) => {
+        const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+        const [isSearchOpen, setIsSearchOpen] = useState(false);
+        const [inputValue, setInputValue] = useState('');
+        const searchInputRef = useRef(null);
+
+        useEffect(() => {
+          if (isSearchOpen && searchInputRef.current) {
+            searchInputRef.current.focus();
+          }
+        }, [isSearchOpen]);
+
+        const navLinks = [
+          { name: 'Home', id: 'home' },
+          { name: 'Firm', id: 'firm' },
+          { name: 'Selected Works', id: 'projects' },
+          { name: 'Contact', id: 'contact' },
+        ];
+
+        const handleNavClick = (id) => {
+          onNavigate(id);
+          setIsMobileMenuOpen(false);
+        };
+
+        const handleSearchInput = (e) => {
+          const val = e.target.value;
+          setInputValue(val);
+          if (val.trim() === '') {
+            onSearchClear();
+          }
+        };
+
+        const handleSearchAction = () => {
+          if (inputValue.trim().length > 0) {
+            onSearchSubmit(inputValue);
+          } else if (isSearchOpen) {
+            setIsSearchOpen(false);
+          } else {
+            setIsSearchOpen(true);
+          }
+        };
+
+        const handleKeyDown = (e) => {
+          if (e.key === 'Enter') {
+            handleSearchAction();
+          }
+        };
+
+        return (
+          <header className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-sm shadow-sm transition-all duration-300">
+            <div className="w-full px-6 md:px-12 h-24 flex items-center justify-between max-w-7xl mx-auto">
+              {/* Logo */}
+              <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-4 cursor-pointer z-50 group" onClick={() => handleNavClick('home')}>
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-brand-red">SJAA</h1>
+                <span className="text-[10px] md:text-xs tracking-[0.2em] text-brand-grey font-light uppercase hidden lg:block group-hover:text-black transition-colors">
+                  Shree Jinendra Architect & Associates
+                </span>
+              </div>
+
+              {/* Desktop Nav */}
+              <div className="hidden md:flex items-center gap-10">
+                <nav className="flex items-center gap-8">
+                  {navLinks.map((link) => (
+                    <button
+                      key={link.name}
+                      onClick={() => handleNavClick(link.id)}
+                      className="text-xs font-medium uppercase tracking-widest hover:text-brand-red transition-colors text-brand-grey py-2 relative group"
+                    >
+                      {link.name}
+                      <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-brand-red transition-all duration-300 group-hover:w-full"></span>
+                    </button>
+                  ))}
+                </nav>
+                
+                {/* Search */}
+                <div className="relative flex items-center">
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isSearchOpen ? 'w-48 opacity-100 mr-2' : 'w-0 opacity-0'}`}>
+                     <input 
+                       ref={searchInputRef}
+                       type="text" 
+                       placeholder="Find..." 
+                       className="w-full bg-transparent border-b border-brand-red/50 text-brand-grey text-sm pb-1 focus:outline-none focus:border-brand-red font-light placeholder-gray-400"
+                       value={inputValue}
+                       onChange={handleSearchInput}
+                       onKeyDown={handleKeyDown}
+                       onBlur={(e) => {
+                         if (e.target.value === '') setIsSearchOpen(false);
+                       }}
+                     />
+                  </div>
+                  <button onClick={handleSearchAction} className="p-2 hover:text-brand-red transition-colors duration-300 text-brand-grey">
+                    <Search size={18} strokeWidth={2} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Mobile Controls */}
+              <div className="md:hidden flex items-center gap-4 z-50">
+                 <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="text-brand-grey p-2">
+                    <Search size={22} strokeWidth={1.5} />
+                  </button>
+                  <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-brand-grey p-2">
+                    {isMobileMenuOpen ? <X size={26} strokeWidth={1.5} /> : <Menu size={26} strokeWidth={1.5} />}
+                  </button>
+              </div>
+            </div>
+
+            {/* Mobile Search Overlay */}
+            <div className={`absolute top-full left-0 w-full bg-white px-6 transition-all duration-300 overflow-hidden md:hidden shadow-md ${isSearchOpen ? 'h-16 border-b border-gray-100' : 'h-0'}`}>
+                <div className="h-full flex items-center gap-2">
+                  <Search size={18} className="text-gray-400" />
+                  <input 
+                     type="text" 
+                     placeholder="Find on page..." 
+                     value={inputValue}
+                     onChange={handleSearchInput}
+                     onKeyDown={handleKeyDown}
+                     className="w-full bg-transparent text-brand-grey text-base font-light outline-none"
+                   />
+                   <button onClick={() => setIsSearchOpen(false)} className="text-gray-400 p-2">
+                     <X size={20} />
+                   </button>
+                </div>
+            </div>
+
+            {/* Mobile Menu */}
+            {isMobileMenuOpen && (
+              <div className="fixed inset-0 top-0 left-0 w-full h-screen bg-white z-40 flex flex-col items-center justify-center gap-8 animate-fade-in">
+                {navLinks.map((link) => (
+                  <button
+                    key={link.name}
+                    onClick={() => handleNavClick(link.id)}
+                    className="text-3xl font-light text-brand-grey hover:text-brand-red transition-colors uppercase tracking-widest"
+                  >
+                    {link.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </header>
+        );
+      };
+
+      /**
+       * Hero Component
+       */
+      const Hero = ({ id }) => {
+        const [currentSlide, setCurrentSlide] = useState(0);
+        const heroSlides = [
+          { image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?q=80&w=2574&auto=format&fit=crop", alt: "Modern Landscape Architecture" },
+          { image: "https://images.unsplash.com/photo-1600596542815-e328701102b9?q=80&w=2669&auto=format&fit=crop", alt: "Luxury Villa Garden" },
+          { image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=2574&auto=format&fit=crop", alt: "Minimalist Courtyard" },
+          { image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2670&auto=format&fit=crop", alt: "Resort Landscape" },
+          { image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2500&auto=format&fit=crop", alt: "Seamless Integration" },
+          { image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2670&auto=format&fit=crop", alt: "Estate Grounds" }
+        ];
+
+        useEffect(() => {
+          const timer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+          }, 5000);
+          return () => clearInterval(timer);
+        }, []);
+
+        const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+        const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? heroSlides.length - 1 : prev - 1));
+
+        return (
+          <section id={id} className="w-full flex flex-col md:flex-row h-screen md:h-[calc(100vh-6rem)] overflow-hidden bg-white">
+            <div className="w-full md:w-[40%] h-[40vh] md:h-full bg-white flex flex-col justify-center items-center p-8 md:p-16 relative z-20 border-b md:border-b-0 md:border-r border-gray-100 order-1">
+              <div className="flex flex-col items-center text-center space-y-6 max-w-md mx-auto">
+                  <div className="w-24 h-24 md:w-32 md:h-32 mb-4">
+                       <div className="w-full h-full flex items-center justify-center">
+                          <img src="https://placehold.co/400x400/D32F2F/FFFFFF.png?text=J&font=playfair" alt="SJAA Red J Logo" className="w-full h-full object-contain drop-shadow-sm" />
+                       </div>
+                  </div>
+                  <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-brand-red leading-tight tracking-tight">Shree Jinendra <br/> Architect & Associates</h1>
+                  <div className="w-16 h-[1px] bg-brand-red/20 my-4"></div>
+                  <p className="font-serif italic text-brand-grey text-lg md:text-xl font-light opacity-80 leading-relaxed">"Sculpting habitats. <br/> Curating the human experience."</p>
+              </div>
+            </div>
+            <div className="w-full md:w-[60%] h-[60vh] md:h-full relative overflow-hidden bg-gray-900 order-2">
+              {heroSlides.map((slide, index) => (
+                <div key={index} className={`absolute inset-0 z-0 transition-opacity duration-[2000ms] ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}>
+                  <img src={slide.image} alt={slide.alt} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/10" />
+                </div>
+              ))}
+              <button onClick={prevSlide} className="absolute left-6 top-1/2 -translate-y-1/2 z-20 text-white/70 hover:text-white transition-colors duration-300 hidden md:block p-3 bg-black/20 hover:bg-black/40 rounded-full backdrop-blur-sm"><ChevronLeft size={32} strokeWidth={1} /></button>
+              <button onClick={nextSlide} className="absolute right-6 top-1/2 -translate-y-1/2 z-20 text-white/70 hover:text-white transition-colors duration-300 hidden md:block p-3 bg-black/20 hover:bg-black/40 rounded-full backdrop-blur-sm"><ChevronRight size={32} strokeWidth={1} /></button>
+              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex gap-3">
+                  {heroSlides.map((_, index) => (
+                  <button key={index} onClick={() => setCurrentSlide(index)} className={`h-1 rounded-full transition-all duration-700 ${index === currentSlide ? 'w-10 bg-white' : 'w-4 bg-white/40 hover:bg-white/80'}`} />
+                  ))}
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      /**
+       * FirmSection Component
+       */
+      const FirmSection = ({ id }) => {
+        return (
+          <section id={id} className="py-24 px-6 md:px-12 bg-white w-full">
+            <div className="max-w-7xl mx-auto flex flex-col gap-24">
+              <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-4">
+                      <span className="h-[1px] w-12 bg-brand-red"></span>
+                      <span className="text-brand-red uppercase tracking-widest text-sm font-medium">Firm Profile</span>
+                  </div>
+                  <h2 className="text-3xl md:text-5xl font-light text-brand-grey leading-tight">Vision & Leadership</h2>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+                  <div className="w-full relative aspect-[3/4] md:aspect-[4/5] lg:aspect-square bg-gray-100 overflow-hidden shadow-sm group">
+                       <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1200&auto=format&fit=crop" alt="Ar. Abhishek Chandaliya" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 ease-out" />
+                       <div className="absolute inset-0 border border-black/5 pointer-events-none"></div>
+                  </div>
+                  <div className="flex flex-col justify-center h-full space-y-10 pt-4">
+                      <div className="space-y-3">
+                          <h3 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-brand-grey tracking-tight">Ar. Abhishek Chandaliya</h3>
+                          <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-brand-red font-semibold">Design Principal & Founder</p>
+                      </div>
+                      <div className="space-y-8">
+                          <p className="text-base md:text-lg font-light text-brand-grey leading-relaxed text-justify md:text-left">
+                              Established in 2008 to dissolve the boundaries between the built and the biotic, SJAA approaches every commission with a singular conviction. Under the leadership of Ar. Abhishek Chandaliya, the practice orchestrates environments where rigorous spatial planning meets the fluidity of the natural world, creating habitats that are not merely constructed, but cultivated.
+                          </p>
+                          <div className="border-l-4 border-brand-red/30 pl-8 py-2">
+                              <p className="text-xl md:text-2xl font-serif italic text-gray-400 leading-relaxed">"Landscape and Architecture are one continuous discipline."</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
+                  <div className="p-8 border border-gray-100 bg-white hover:border-brand-red/30 hover:shadow-sm transition-all duration-500 group flex flex-col h-full">
+                      <div className="mb-8 text-brand-red group-hover:scale-110 transition-transform duration-500 origin-left"><Shield size={40} strokeWidth={1.2} /></div>
+                      <h4 className="text-lg font-medium text-brand-red mb-4 uppercase tracking-wide">Curated Living</h4>
+                      <p className="text-base text-gray-500 font-light leading-relaxed">We sculpt spaces that elevate daily rituals. Prioritizing proportion and scale, we curate environments that foster mental well-being and timeless elegance.</p>
+                  </div>
+                  <div className="p-8 border border-gray-100 bg-white hover:border-brand-red/30 hover:shadow-sm transition-all duration-500 group flex flex-col h-full">
+                      <div className="mb-8 text-brand-red group-hover:scale-110 transition-transform duration-500 origin-left"><Settings size={40} strokeWidth={1.2} /></div>
+                      <h4 className="text-lg font-medium text-brand-red mb-4 uppercase tracking-wide">Technical Precision</h4>
+                      <p className="text-base text-gray-500 font-light leading-relaxed">Bridging the void between vision and reality. We orchestrate complex construction systems with absolute rigor, ensuring that design intent translates flawlessly.</p>
+                  </div>
+                  <div className="p-8 border border-gray-100 bg-white hover:border-brand-red/30 hover:shadow-sm transition-all duration-500 group flex flex-col h-full">
+                      <div className="mb-8 text-brand-red group-hover:scale-110 transition-transform duration-500 origin-left"><Infinity size={40} strokeWidth={1.2} /></div>
+                      <h4 className="text-lg font-medium text-brand-red mb-4 uppercase tracking-wide">Biophilic Fusion</h4>
+                      <p className="text-base text-gray-500 font-light leading-relaxed">A seamless synthesis of soil, climate, and architecture. We engineer ecosystems that function as living, breathing extensions of the human experience.</p>
+                  </div>
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      /**
+       * ProjectsSection Component
+       */
+      const ProjectsSection = ({ id }) => {
+        const [activeTab, setActiveTab] = useState('All Works');
+        const [isExpanded, setIsExpanded] = useState(false);
+        const INITIAL_DISPLAY_COUNT = 15;
+        
+        const tabs = [
+          'All Works', 'Luxury Residences', 'Hospitality & Resorts', 'Private Retreats',
+          'Country Estates', 'Housing Developments', 'Township Master Plans',
+          'Commercial Scapes', 'Recreational Hubs', 'Institutional Campuses'
+        ];
+
+        const projectsData = [
+          { id: 13, title: 'Rajasthali Resort', location: 'Jaipur', category: 'Hospitality', subCategory: 'Resort', imgSeed: 113 },
+          { id: 1, title: 'Elysian Heaven', location: 'Jaipur', category: 'Residential', subCategory: 'High-End Residential', imgSeed: 101 },
+          { id: 8, title: 'Fateh Hills', location: 'Jalore', category: 'Township', subCategory: 'Township', imgSeed: 108 },
+          { id: 14, title: 'Nowal Naturecure', location: 'Jaipur', category: 'Hospitality', subCategory: 'Wellness Resort', imgSeed: 114 },
+          { id: 16, title: 'Sand Dunes Resort', location: 'Pushkar', category: 'Hospitality', subCategory: 'Resort', imgSeed: 116 },
+          { id: 10, title: 'Vrindavan Township', location: 'Jaipur', category: 'Township', subCategory: 'Township', imgSeed: 110 },
+          { id: 22, title: 'CLC Campus', location: 'Sikar', category: 'Institutional', subCategory: 'Educational', imgSeed: 122 },
+          { id: 15, title: "Archi's Castle", location: 'Ajmer', category: 'Hospitality', subCategory: 'Resort', imgSeed: 115 },
+          { id: 3, title: 'Opulent Nest', location: 'Jaipur', category: 'Residential', subCategory: 'High-End Residential', imgSeed: 103 },
+          { id: 17, title: 'The Crown', location: 'Jaipur', category: 'Residential', subCategory: 'Group Housing', imgSeed: 117 },
+          { id: 18, title: 'The Crest', location: 'Jaipur', category: 'Residential', subCategory: 'Group Housing', imgSeed: 118 },
+          { id: 2, title: 'Classic Oasis', location: 'Jaipur', category: 'Residential', subCategory: 'Farm House', imgSeed: 102 },
+          { id: 4, title: 'Cultural Elegance', location: 'Bikaner', category: 'Residential', subCategory: 'Farm House', imgSeed: 104 },
+          { id: 5, title: 'Classical Grandeur', location: 'Jaipur', category: 'Residential', subCategory: 'High-End Residential', imgSeed: 105 },
+          { id: 6, title: 'Blossom Ridge', location: 'Jaipur', category: 'Residential', subCategory: 'Out House', imgSeed: 106 },
+          { id: 7, title: 'Regalia Oasis', location: 'Jaipur', category: 'Residential', subCategory: 'Out House', imgSeed: 107 },
+          { id: 19, title: 'Imperial Garden', location: 'Jaipur', category: 'Residential', subCategory: 'Group Housing', imgSeed: 119 },
+          { id: 9, title: 'Navkar City', location: 'Jodhpur', category: 'Township', subCategory: 'Township', imgSeed: 109 },
+          { id: 11, title: 'Samurai Valley', location: 'Jaipur', category: 'Township', subCategory: 'Township', imgSeed: 111 },
+          { id: 12, title: 'Shitla Township', location: 'Jaipur', category: 'Township', subCategory: 'Township', imgSeed: 112 },
+          { id: 20, title: 'Navkar Nilay', location: 'Bhilwara', category: 'Residential', subCategory: 'Group Housing', imgSeed: 120 },
+          { id: 21, title: 'Dev Vidhyalya', location: 'Sikar', category: 'Institutional', subCategory: 'Educational', imgSeed: 121 },
+          { id: 23, title: 'Onir Ceramics', location: 'Jaipur', category: 'Commercial', subCategory: 'Commercial', imgSeed: 123 },
+          { id: 24, title: 'Laxmi Poddar Seva', location: 'Salasar', category: 'Commercial', subCategory: 'Community', imgSeed: 124 },
+        ];
+
+        const filteredProjects = projectsData.filter(project => {
+          switch (activeTab) {
+            case 'All Works': return true;
+            case 'Luxury Residences': return project.subCategory === 'High-End Residential';
+            case 'Hospitality & Resorts': return project.category === 'Hospitality';
+            case 'Private Retreats': return project.subCategory === 'Out House';
+            case 'Country Estates': return project.subCategory === 'Farm House';
+            case 'Housing Developments': return project.subCategory === 'Group Housing';
+            case 'Township Master Plans': return project.category === 'Township';
+            case 'Commercial Scapes': return project.category === 'Commercial' && project.subCategory === 'Commercial';
+            case 'Recreational Hubs': return project.subCategory === 'Community';
+            case 'Institutional Campuses': return project.category === 'Institutional';
+            default: return true;
+          }
+        });
+
+        const displayedProjects = isExpanded ? filteredProjects : filteredProjects.slice(0, INITIAL_DISPLAY_COUNT);
+
+        const getCardStyle = (index, total) => {
+          if (total < 3) return { colSpan: 'col-span-1', aspectRatio: 'aspect-[4/3]', isLarge: false };
+          const positionInCycle = index % 10;
+          const isLarge = positionInCycle === 0 || positionInCycle === 6;
+          return { colSpan: isLarge ? 'md:col-span-2' : 'col-span-1', aspectRatio: isLarge ? 'aspect-[4/3] md:aspect-[2/1]' : 'aspect-[4/3]', isLarge };
+        };
+
+        return (
+          <section id={id} className="py-24 px-6 md:px-12 bg-white w-full">
+            <div className="max-w-7xl mx-auto">
+              <div className="mb-12 space-y-4">
+                <div className="flex items-center gap-4">
+                   <span className="h-[1px] w-12 bg-brand-red"></span>
+                   <span className="text-brand-red uppercase tracking-widest text-sm font-medium">Portfolio</span>
+                </div>
+                <h2 className="text-3xl md:text-5xl font-light text-brand-grey leading-tight">Selected Works</h2>
+                <p className="text-base text-gray-500 font-light max-w-2xl leading-relaxed">A curation of our specialized landscape interventions—from private sanctuaries to master-planned townships. Shaping the void between the built and the biotic.</p>
+              </div>
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 mb-16 w-full max-w-5xl mx-auto">
+                {tabs.map((tab) => {
+                  const isActive = activeTab === tab;
+                  const isAll = tab === 'All Works';
+                  return (
+                    <button key={tab} onClick={() => setActiveTab(tab)} className={`relative text-xs md:text-sm uppercase tracking-widest py-2 px-1 transition-all duration-300 ${isActive ? 'text-brand-red font-medium' : isAll ? 'text-brand-grey font-medium' : 'text-brand-grey/50 hover:text-brand-grey font-light'}`}>
+                      {tab}
+                      <span className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-[1px] bg-brand-red transition-all duration-300 ${isActive ? 'w-full' : 'w-0'}`}></span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 auto-dense">
+                {displayedProjects.length > 0 ? (
+                  displayedProjects.map((project, index) => {
+                    const style = getCardStyle(index, displayedProjects.length);
+                    return (
+                      <div key={project.id} className={`group cursor-pointer flex flex-col fade-in-up ${style.colSpan}`}>
+                        <div className={`relative overflow-hidden mb-4 bg-gray-100 w-full ${style.aspectRatio}`}>
+                          <img src={`https://picsum.photos/seed/${project.imgSeed}/800/600`} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" loading="lazy" />
+                          <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                          <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-[10px] uppercase tracking-wider text-brand-grey opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">{project.subCategory}</div>
+                        </div>
+                        <div className="flex justify-between items-start mt-2 px-1">
+                          <div>
+                            <h4 className={`font-medium text-brand-grey group-hover:text-brand-red transition-colors duration-300 ${style.isLarge ? 'text-2xl' : 'text-xl'}`}>{project.title}</h4>
+                            <p className="text-sm text-gray-500 mt-1 font-light tracking-wide flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-brand-red/50"></span>{project.location}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="col-span-full py-12 text-center text-gray-400 font-light">No projects found in this category.</div>
+                )}
+              </div>
+              {!isExpanded && filteredProjects.length > INITIAL_DISPLAY_COUNT && (
+                <div className="relative flex justify-center items-center mt-20 w-full">
+                  <div className="absolute w-full h-[1px] bg-gray-200"></div>
+                  <button onClick={() => setIsExpanded(true)} className="relative z-10 bg-white px-8 py-3 text-sm uppercase tracking-widest font-medium text-brand-grey hover:text-brand-red transition-colors duration-300 flex items-center gap-2 shadow-sm">
+                      View More Works <ArrowDown size={16} strokeWidth={1.5} />
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
+        );
+      };
+
+      /**
+       * SignatureElementsSection Component
+       */
+      const SignatureElementsSection = ({ id }) => {
+        const [selectedElement, setSelectedElement] = useState(null);
+        const elements = [
+          { title: "Vertical Ecosystems", subtitle: "The Living Skin", desc: "Breathing green planes that soften the built form and purify the air.", img: "https://images.unsplash.com/photo-1558435186-d31d10204685?q=80&w=800&auto=format&fit=crop", gallery: ["https://images.unsplash.com/photo-1530263690623-644cb33e695d?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1505577058444-a3dab90d4253?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1459156212016-c812468e2115?q=80&w=800&auto=format&fit=crop"] },
+          { title: "Spatial Artifacts", subtitle: "The Visual Anchor", desc: "Curated forms that punctuate space, holding the gaze in moments of stillness.", img: "https://images.unsplash.com/photo-1495574526543-98fe85906d48?q=80&w=800&auto=format&fit=crop", gallery: ["https://images.unsplash.com/photo-1605553070442-c9413697e5c9?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1516149893016-813d9a01d521?q=80&w=800&auto=format&fit=crop"] },
+          { title: "Aquatic Voids", subtitle: "The Still Reflection", desc: "Expanses of water mirroring the sky, merging luxury with deep tranquility.", img: "https://images.unsplash.com/photo-1572331165267-854da2b00ca1?q=80&w=800&auto=format&fit=crop", gallery: ["https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1562778612-e1e0cda9915c?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1432462770865-65b70566d679?q=80&w=800&auto=format&fit=crop"] },
+          { title: "Native Softscape", subtitle: "The Breath", desc: "A curated palette of indigenous flora ensuring seasonal rhythm and biodiversity.", img: "https://images.unsplash.com/photo-1416879741263-d301e1eaca27?q=80&w=800&auto=format&fit=crop", gallery: ["https://images.unsplash.com/photo-1502005229766-528352a2e780?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1466781783310-a2ac7d6dd7ee?q=80&w=800&auto=format&fit=crop"] },
+          { title: "Privacy Veils", subtitle: "The Light Filter", desc: "Intricate screens offering seclusion while sculpting light into geometric poetry.", img: "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?q=80&w=800&auto=format&fit=crop", gallery: ["https://images.unsplash.com/photo-1598337586548-26168537574b?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1574928224536-e04f056d6d87?q=80&w=800&auto=format&fit=crop"] },
+          { title: "Shadow Frames", subtitle: "The Geometric Interplay", desc: "Structural lattices that invite nature to climb, casting dancing shadows below.", img: "https://images.unsplash.com/photo-1598337586548-26168537574b?q=80&w=800&auto=format&fit=crop", gallery: ["https://images.unsplash.com/photo-1502005097973-6a7082348e28?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1589129140855-3943e0319dd6?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1558435186-d31d10204685?q=80&w=800&auto=format&fit=crop"] },
+          { title: "Material Textures", subtitle: "The Tactility", desc: "Raw, tactile surfaces that age gracefully, inviting touch and grounding the sensory experience.", img: "https://images.unsplash.com/photo-1620626011761-996317b8d101?q=80&w=800&auto=format&fit=crop", gallery: ["https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop"] },
+          { title: "Pavilions", subtitle: "The Sanctuary", desc: "Floating shelters that frame the horizon, dissolving boundaries between protection and the open landscape.", img: "https://images.unsplash.com/photo-1560026301-883406a6f314?q=80&w=800&auto=format&fit=crop", gallery: ["https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1600596542815-e328701102b9?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?q=80&w=800&auto=format&fit=crop"] },
+          { title: "Canopies", subtitle: "The Light Play", desc: "Overhead planes filtering sunlight into ephemeral patterns, creating a dynamic dance of shadow.", img: "https://images.unsplash.com/photo-1519302959554-279c631653f9?q=80&w=800&auto=format&fit=crop", gallery: ["https://images.unsplash.com/photo-1589129140855-3943e0319dd6?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop","https://images.unsplash.com/photo-1600596542815-e328701102b9?q=80&w=800&auto=format&fit=crop"] }
+        ];
+
+        return (
+          <section id={id} className="py-24 bg-neutral-900 text-white w-full overflow-hidden relative">
+            <div className="w-full px-6 md:px-12 mb-16 max-w-7xl mx-auto">
+                <div className="flex items-center gap-4 mb-4">
+                   <span className="h-[1px] w-12 bg-brand-red"></span>
+                   <span className="text-brand-red uppercase tracking-widest text-sm font-medium">Detailing</span>
+                </div>
+                <h2 className="text-3xl md:text-5xl font-light leading-tight">Design Articulation</h2>
+                <p className="text-base text-gray-400 mt-4 font-light max-w-xl leading-relaxed">The nuanced details and sensory layers that compose our spatial narrative.</p>
+            </div>
+            <div className="w-full overflow-x-auto scrollbar-hide pb-8 px-6 md:px-12">
+              <div className="flex gap-6 w-max">
+                  {elements.map((el, index) => (
+                      <div key={index} onClick={() => setSelectedElement(el)} className="relative w-[280px] md:w-[340px] h-[450px] md:h-[520px] shrink-0 overflow-hidden group transition-all duration-500 ease-in-out hover:w-[320px] md:hover:w-[420px] bg-gray-800 cursor-pointer">
+                          <img src={el.img} alt={el.title} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 pointer-events-none" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
+                          <div className="absolute bottom-0 left-0 w-full p-8 flex flex-col justify-end pointer-events-none">
+                              <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
+                                  <h4 className="text-2xl md:text-3xl font-bold uppercase tracking-wide text-white mb-1">{el.title}</h4>
+                                  <p className="text-lg text-white/80 font-serif italic mb-4">{el.subtitle}</p>
+                                  <div className="max-h-0 group-hover:max-h-32 overflow-hidden transition-all duration-700 ease-in-out">
+                                      <p className="text-base text-gray-300 font-light leading-relaxed pt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">{el.desc}</p>
+                                  </div>
+                              </div>
+                          </div>
+                          <div className="absolute top-0 left-0 w-full h-1 bg-brand-red transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                      </div>
+                  ))}
+              </div>
+            </div>
+            {selectedElement && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4 md:p-12 animate-fade-in">
+                  <button onClick={() => setSelectedElement(null)} className="absolute top-6 right-6 z-50 p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all"><X size={32} strokeWidth={1.5} /></button>
+                  <div className="max-w-7xl w-full h-full flex flex-col overflow-hidden">
+                      <div className="mb-8 shrink-0">
+                          <span className="text-brand-red uppercase tracking-widest text-sm font-bold block mb-2">{selectedElement.subtitle}</span>
+                          <h2 className="text-3xl md:text-5xl text-white font-light mb-4">{selectedElement.title}</h2>
+                          <p className="text-gray-400 font-light max-w-2xl leading-relaxed text-base md:text-lg border-l-2 border-brand-red/50 pl-4">{selectedElement.desc}</p>
+                      </div>
+                      <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8 scrollbar-hide">
+                          <div className="aspect-[4/3] bg-gray-800 overflow-hidden rounded-sm group">
+                              <img src={selectedElement.img} alt={selectedElement.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                          </div>
+                          {selectedElement.gallery.map((img, i) => (
+                              <div key={i} className="aspect-[4/3] bg-gray-800 overflow-hidden rounded-sm group">
+                                  <img src={img} alt={`${selectedElement.title} detail ${i + 1}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                              </div>
+                          ))}
+                      </div>
+                  </div>
+              </div>
+            )}
+          </section>
+        );
+      };
+
+      /**
+       * CollaborationsSection Component
+       */
+      const CollaborationsSection = ({ id }) => {
+        const partners = [
+          { icon: <Building2 size={48} strokeWidth={1} />, quote: "For our high-end villas, detailing is everything. SJAA’s hardscape and water body details are flawless and execution-friendly.", name: "Ar. Rajkumar Kumawat", role: "Principal Architect", firm: "Rajkumar Architects" },
+          { icon: <Landmark size={48} strokeWidth={1} />, quote: "Designing a township requires a macro vision. SJAA delivered a master plan that perfectly balanced green cover with infrastructure.", name: "Dr. Shashikant Sharma", role: "Director", firm: "Genesis Design Studio" },
+          { icon: <PenTool size={48} strokeWidth={1} />, quote: "SJAA's understanding of contours and native planting turned our resort concept into a thriving ecosystem. A true technical partner.", name: "Ar. Sheetal Agarwal", role: "Principal Architect", firm: "Insight Studios" }
+        ];
+
+        return (
+          <section id={id} className="py-24 px-6 md:px-12 bg-white w-full border-t border-gray-100">
+            <div className="max-w-7xl mx-auto">
+              <div className="mb-16 text-center space-y-4">
+                <h2 className="text-3xl md:text-5xl font-light text-brand-grey leading-tight">Integrated Design Alliances</h2>
+                <p className="max-w-2xl mx-auto text-gray-500 font-light leading-relaxed text-base">Collaborating with top-tier architects, designers, and developers to deliver complex master plans, bringing technical rigor and ecological expertise to the table.</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                  {partners.map((partner, index) => (
+                      <div key={index} className="bg-white border border-gray-100 p-10 md:p-12 flex flex-col items-center text-center transition-all duration-500 hover:-translate-y-2 hover:border-brand-red hover:shadow-lg group cursor-default">
+                          <div className="h-20 w-20 mb-8 rounded-full bg-gray-50 text-gray-400 group-hover:text-brand-grey flex items-center justify-center transition-colors">{partner.icon}</div>
+                          <p className="font-serif italic text-gray-500 leading-relaxed mb-10 text-lg md:text-xl">"{partner.quote}"</p>
+                          <div className="w-12 h-[1px] bg-gray-200 group-hover:bg-brand-red/50 transition-colors mb-6 mt-auto"></div>
+                          <div className="space-y-1">
+                              <h5 className="text-sm font-bold uppercase tracking-widest text-brand-grey">{partner.name}</h5>
+                              <p className="text-xs uppercase tracking-wider text-gray-400 font-medium">{partner.role}</p>
+                          </div>
+                      </div>
+                  ))}
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      /**
+       * TestimonialsSection Component
+       */
+      const TestimonialsSection = ({ id }) => {
+        const testimonials = [
+          { quote: "SJAA transformed our resort vision into a breathing ecosystem. Their understanding of Aesthetics, Design and Detailing is unmatched.", author: "Director", project: "Nowal Naturecure" },
+          { quote: "A team that balances luxury with sustainability perfectly. The detailing on our township project was flawless.", author: "Developer", project: "Fateh Hills" },
+          { quote: "Professional, creative, and deeply technical. The best landscape partners we have worked with.", author: "Owner", project: "Glass Haven" }
+        ];
+
+        return (
+          <section id={id} className="py-24 px-6 md:px-12 bg-brand-light w-full">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex flex-col items-center mb-16 text-center">
+                 <h2 className="text-3xl md:text-5xl font-light text-brand-grey leading-tight">Client Experiences</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 justify-items-center">
+                {testimonials.map((t, index) => (
+                  <div key={index} className="w-full max-w-[340px] aspect-square rounded-full bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-500 flex flex-col items-center justify-center p-8 md:p-12 text-center group">
+                    <div className="mb-6 opacity-20 group-hover:opacity-40 transition-opacity"><i className="fa-solid fa-quote-left text-brand-grey text-2xl"></i></div>
+                    <p className="font-serif italic text-lg text-brand-grey leading-relaxed mb-6 line-clamp-4">"{t.quote}"</p>
+                    <div className="border-t border-brand-red/20 pt-4 w-12 group-hover:w-24 transition-all duration-500">
+                      <p className="text-xs uppercase tracking-widest font-bold text-brand-red mb-1">{t.author}</p>
+                      <p className="text-sm font-light text-gray-500">{t.project}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      /**
+       * ContactSection Component
+       * CRITICAL UPDATE: Global Elite Standards
+       */
+      const ContactSection = ({ id }) => {
+        return (
+          <section id={id} className="py-24 px-6 md:px-12 bg-brand-grey text-white w-full">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
+              <div className="space-y-12">
+                <div className="space-y-4">
+                  <h2 className="text-3xl md:text-5xl font-light leading-tight">Start a <br/> Dialogue.</h2>
+                  <p className="text-gray-400 font-light max-w-md text-base tracking-wide leading-relaxed">We engage with visionary clients seeking to create legacy projects. Tell us about your aspirations.</p>
+                </div>
+                <form className="space-y-8 max-w-md">
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="text-xs uppercase tracking-widest text-brand-red font-medium block">Name</label>
+                    <input type="text" id="name" className="w-full bg-transparent border-b border-white/20 py-4 text-base md:text-lg font-light focus:outline-none focus:border-white transition-colors placeholder-gray-600 rounded-none" placeholder="Your full name" />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="text-xs uppercase tracking-widest text-brand-red font-medium block">Email Address</label>
+                    <input type="email" id="email" className="w-full bg-transparent border-b border-white/20 py-4 text-base md:text-lg font-light focus:outline-none focus:border-white transition-colors placeholder-gray-600 rounded-none" placeholder="yourname@example.com" />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="phone" className="text-xs uppercase tracking-widest text-brand-red font-medium block">Phone</label>
+                    <input type="tel" id="phone" className="w-full bg-transparent border-b border-white/20 py-4 text-base md:text-lg font-light focus:outline-none focus:border-white transition-colors placeholder-gray-600 rounded-none" placeholder="+91 00000 00000" />
+                  </div>
+                  {/* Fixed Label and Global Elite Options */}
+                  <div className="space-y-2">
+                     <label htmlFor="projectType" className="text-xs uppercase tracking-widest text-brand-red font-medium block">PROJECT TYPOLOGY</label>
+                     <div className="relative">
+                        <select id="projectType" className="w-full bg-transparent border-b border-white/20 py-4 text-base md:text-lg font-light focus:outline-none focus:border-white transition-colors appearance-none text-white cursor-pointer rounded-none pr-8" defaultValue="">
+                          <option value="" disabled className="text-gray-500 bg-[#333]">Select typology...</option>
+                          <option value="Private Retreats" className="bg-[#333] text-white">Private Retreats</option>
+                          <option value="Country Estates" className="bg-[#333] text-white">Country Estates</option>
+                          <option value="Luxury Residences" className="bg-[#333] text-white">Luxury Residences</option>
+                          <option value="Housing Developments" className="bg-[#333] text-white">Housing Developments</option>
+                          <option value="Institutional Campuses" className="bg-[#333] text-white">Institutional Campuses</option>
+                          <option value="Recreational Hubs" className="bg-[#333] text-white">Recreational Hubs</option>
+                          <option value="Urban Realms" className="bg-[#333] text-white">Urban Realms</option>
+                          <option value="Commercial" className="bg-[#333] text-white">Commercial</option>
+                          <option value="Hospitality" className="bg-[#333] text-white">Hospitality</option>
+                          <option value="Township" className="bg-[#333] text-white">Township</option>
+                          <option value="Healthcare" className="bg-[#333] text-white">Healthcare</option>
+                          <option value="Other" className="bg-[#333] text-white">Other</option>
+                        </select>
+                        <ChevronDown size={20} className="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+                     </div>
+                  </div>
+                  {/* Refined Micro-Copy */}
+                  <div className="space-y-2">
+                    <label htmlFor="details" className="text-xs uppercase tracking-widest text-brand-red font-medium block">Project Details</label>
+                    <textarea id="details" rows={3} className="w-full bg-transparent border-b border-white/20 py-4 text-base md:text-lg font-light focus:outline-none focus:border-white transition-colors resize-none placeholder-gray-600 rounded-none" placeholder="Briefly describe your site and design aspirations..."></textarea>
+                  </div>
+                  {/* Elevated Button Text */}
+                  <button type="submit" className="group flex items-center gap-4 text-white pt-6 hover:text-brand-red transition-colors">
+                    <span className="uppercase tracking-widest text-sm font-medium">INITIATE DIALOGUE</span>
+                    <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform"/>
+                  </button>
+                </form>
+              </div>
+              <div className="flex flex-col justify-end space-y-12 md:pl-12">
+                <div className="border-t border-white/10 pt-8">
+                   <h4 className="uppercase tracking-widest text-xs text-brand-red mb-4 font-bold">Studio</h4>
+                   <p className="font-light text-lg leading-relaxed text-gray-200">C-86C, Nandkishore Pareek Marg,<br/>near Kanoria College, Bapu Nagar,<br/>Jaipur (Rajasthan) 302015</p>
+                </div>
+                <div className="border-t border-white/10 pt-8">
+                   <h4 className="uppercase tracking-widest text-xs text-brand-red mb-4 font-bold">Contact</h4>
+                   <div className="space-y-3">
+                     <p className="font-light text-lg text-gray-200"><a href="tel:+919314622669" className="hover:text-white transition-colors block py-1">+91-93146-22669</a></p>
+                     <p className="font-light text-lg text-gray-200"><a href="mailto:sjaa@shreejinendra.com" className="hover:text-white transition-colors block py-1">sjaa@shreejinendra.com</a></p>
+                   </div>
+                </div>
+                <div className="border-t border-white/10 pt-8">
+                   <h4 className="uppercase tracking-widest text-xs text-brand-red mb-4 font-bold">Careers</h4>
+                   <p className="font-light text-base text-gray-400 mb-4">We are always looking for exceptional talent.</p>
+                   <div className="flex flex-col items-start gap-3">
+                      <a href="mailto:info@shreejinendra.com?subject=Job Application" className="text-white hover:text-brand-red transition-colors border-b border-white/30 hover:border-brand-red pb-1 text-base font-light">Apply for Job</a>
+                      <a href="mailto:info@shreejinendra.com?subject=Internship Application" className="text-white hover:text-brand-red transition-colors border-b border-white/30 hover:border-brand-red pb-1 text-base font-light">Apply for Internship</a>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      /**
+       * Footer Component
+       */
+      const Footer = () => {
+        return (
+          <footer className="bg-[#1a1a1a] text-white py-12 px-6 border-t border-white/5">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+              <p className="text-sm text-gray-500 font-light tracking-wide">&copy; SJAA 2008-2026</p>
+              <div className="flex gap-6">
+                  <a href="https://www.instagram.com/shreejinendra/?hl=en" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-brand-red transition-colors" aria-label="Instagram"><Instagram size={20} strokeWidth={1.5} /></a>
+                  <a href="https://www.linkedin.com/company/shreejinendra" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-brand-red transition-colors" aria-label="LinkedIn"><Linkedin size={20} strokeWidth={1.5} /></a>
+                  <a href="#" className="text-gray-500 hover:text-brand-red transition-colors" aria-label="Facebook"><Facebook size={20} strokeWidth={1.5} /></a>
+              </div>
+            </div>
+          </footer>
+        );
+      };
+
+      /**
+       * Main App Component
+       */
+      const App = () => {
+        const matchesRef = useRef([]);
+        const currentIndexRef = useRef(0);
+        const lastQueryRef = useRef('');
+        const toastRef = useRef(null);
+        const toastTimeoutRef = useRef(null);
+
+        const scrollToSection = (id) => {
+          const element = document.getElementById(id);
+          if (element) {
+            const headerOffset = 100;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+          }
+        };
+
+        const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        const clearHighlights = () => {
+          const highlights = document.querySelectorAll('.app-highlight');
+          highlights.forEach(span => {
+              const parent = span.parentNode;
+              if (parent) {
+                   parent.replaceChild(document.createTextNode(span.textContent || ''), span);
+                   parent.normalize(); 
+              }
+          });
+          matchesRef.current = [];
+          currentIndexRef.current = 0;
+        };
+
+        const showToast = (message) => {
+          if (toastRef.current) {
+            toastRef.current.textContent = message;
+            toastRef.current.classList.add('show');
+            if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+            toastTimeoutRef.current = window.setTimeout(() => {
+              if (toastRef.current) toastRef.current.classList.remove('show');
+            }, 3000);
+          }
+        };
+
+        const performSearch = (term) => {
+          clearHighlights();
+          if (!term || term.trim() === '') return;
+          const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+            acceptNode: (node) => {
+                if (node.parentElement && (node.parentElement.tagName === 'SCRIPT' || node.parentElement.tagName === 'STYLE' || node.parentElement.classList.contains('app-highlight'))) {
+                    return NodeFilter.FILTER_REJECT;
+                }
+                return NodeFilter.FILTER_ACCEPT;
+            }
+          });
+          const nodesToProcess = [];
+          while(walker.nextNode()) { nodesToProcess.push(walker.currentNode); }
+          const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
+          const newMatches = [];
+          nodesToProcess.forEach(node => {
+            const text = node.nodeValue || '';
+            if (regex.test(text)) {
+               const fragment = document.createDocumentFragment();
+               let lastIdx = 0;
+               text.replace(regex, (match, p1, offset) => {
+                   if (offset > lastIdx) fragment.appendChild(document.createTextNode(text.slice(lastIdx, offset)));
+                   const span = document.createElement('span');
+                   span.className = 'app-highlight';
+                   span.textContent = match;
+                   fragment.appendChild(span);
+                   newMatches.push(span);
+                   lastIdx = offset + match.length;
+                   return match;
+               });
+               if (lastIdx < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIdx)));
+               if (node.parentNode) node.parentNode.replaceChild(fragment, node);
+            }
+          });
+          matchesRef.current = newMatches;
+          if (newMatches.length > 0) {
+            currentIndexRef.current = 0;
+            highlightCurrentMatch();
+          } else {
+            showToast("No matches found on page.");
+          }
+        };
+
+        const highlightCurrentMatch = () => {
+          matchesRef.current.forEach(el => el.classList.remove('active-match'));
+          const current = matchesRef.current[currentIndexRef.current];
+          if (current) {
+            current.classList.add('active-match');
+            current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        };
+
+        const handleSearchSubmit = (query) => {
+          if (query === lastQueryRef.current && matchesRef.current.length > 0) {
+            currentIndexRef.current = (currentIndexRef.current + 1) % matchesRef.current.length;
+            highlightCurrentMatch();
+          } else {
+            lastQueryRef.current = query;
+            performSearch(query);
+          }
+        };
+
+        const handleSearchClear = () => {
+          clearHighlights();
+          lastQueryRef.current = '';
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col w-full overflow-x-hidden">
+            <Header onNavigate={scrollToSection} onSearchSubmit={handleSearchSubmit} onSearchClear={handleSearchClear} />
+            <div id="search-toast" ref={toastRef}>No matches found on page.</div>
+            <main className="flex-grow pt-24">
+              <Hero id="home" />
+              <FirmSection id="firm" />
+              <ProjectsSection id="projects" />
+              <SignatureElementsSection id="elements" />
+              <CollaborationsSection id="collaborations" />
+              <TestimonialsSection id="testimonials" />
+              <ContactSection id="contact" />
+            </main>
+            <Footer />
+          </div>
+        );
+      };
+
+      const root = createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
   </body>
 </html>
