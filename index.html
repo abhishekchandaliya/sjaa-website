@@ -41,7 +41,7 @@
         font-family: 'Inter', sans-serif;
         color: #333333;
         background-color: #ffffff;
-        font-size: 16px; /* Global Elite Standard */
+        font-size: 16px;
         scroll-behavior: smooth;
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
@@ -74,9 +74,9 @@
       .delay-200 { animation-delay: 0.2s; }
       .delay-400 { animation-delay: 0.4s; }
 
-      /* Search Highlight Styles - UPDATED TO YELLOW */
+      /* Search Highlight Styles */
       .app-highlight {
-        background-color: #FFFF00; /* Yellow */
+        background-color: #FFFF00;
         color: #000000;
         padding: 0 2px;
         border-radius: 2px;
@@ -84,7 +84,7 @@
       }
 
       .app-highlight.active-match {
-        background-color: #FFA500; /* Orange */
+        background-color: #FFA500;
         color: #000000;
         box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.4);
         font-weight: 700;
@@ -127,7 +127,7 @@
       }
     </style>
 
-    <!-- React Dependencies & Babel -->
+    <!-- React Dependencies & Babel (Fixed Import Map) -->
     <script type="importmap">
 {
   "imports": {
@@ -156,7 +156,7 @@
       } from 'lucide-react';
 
       /**
-       * Header Component with Robust Search
+       * Header Component
        */
       const Header = ({ onNavigate, onSearch, onNext, onPrev, onClear, currentMatch, totalMatches }) => {
         const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -202,12 +202,14 @@
           <header className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-sm shadow-sm transition-all duration-300">
             <div className="w-full px-6 md:px-12 h-24 flex items-center justify-between max-w-7xl mx-auto relative">
               
-              {/* Logo - Hidden on mobile when searching */}
+              {/* Logo */}
               <div 
                 className={`flex flex-col md:flex-row md:items-center gap-4 cursor-pointer z-50 group ${isSearchOpen ? 'hidden md:flex' : 'flex'}`} 
                 onClick={() => handleNavClick('home')}
               >
-                <img src="LOGO.png" alt="SJAA Logo" className="h-10 md:h-12 w-auto object-contain" />
+                 {/* Replace with actual logo image path if available, using text as fallback for this demo */}
+                <img src="./sjaa-logo.png" alt="SJAA Logo" className="h-10 md:h-12 w-auto object-contain" onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='block'}} />
+                <span className="hidden text-2xl font-serif font-bold tracking-tight text-brand-grey">SJAA</span>
               </div>
 
               {/* Desktop Nav */}
@@ -284,7 +286,7 @@
       const Hero = ({ id }) => {
         const [currentSlide, setCurrentSlide] = useState(0);
         const heroSlides = [
-          { image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?q=80&w=2574&auto=format&fit=crop", alt: "Modern Landscape Architecture" },
+          { image: "./modern-landscape-architecture.jpg", alt: "Modern Landscape Architecture" },
           { image: "https://images.unsplash.com/photo-1600596542815-e328701102b9?q=80&w=2669&auto=format&fit=crop", alt: "Luxury Villa Garden" },
           { image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=2574&auto=format&fit=crop", alt: "Minimalist Courtyard" },
           { image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2670&auto=format&fit=crop", alt: "Resort Landscape" },
@@ -307,7 +309,8 @@
             <div className="w-full md:w-[40%] h-[40vh] md:h-full bg-white flex flex-col justify-center items-center p-8 md:p-12 relative z-20 border-b md:border-b-0 md:border-r border-gray-100 order-1">
               <div className="flex flex-col items-center text-center w-full max-w-lg mx-auto h-full justify-center">
                   <div className="flex-grow flex items-center justify-center w-full">
-                      <img src="LOGO.png" alt="SJAA Logo" className="w-auto h-[60%] md:h-[70%] object-contain drop-shadow-sm max-h-[60vh]" />
+                      <img src="./sjaa-logo.png" alt="SJAA Logo" className="w-auto h-[60%] md:h-[70%] object-contain drop-shadow-sm max-h-[60vh]" onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='block'}} />
+                      <div className="hidden text-6xl font-serif font-bold tracking-tight text-brand-grey border-4 border-brand-grey p-4">SJAA</div>
                   </div>
                   <div className="flex-shrink-0 pt-8 pb-4">
                       <p className="font-serif italic text-brand-grey text-lg md:text-xl font-light opacity-80 leading-relaxed tracking-wide">"Sculpting habitats. <br/> Curating the human experience."</p>
@@ -349,7 +352,7 @@
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
                   <div className="w-full relative aspect-[3/4] md:aspect-[4/5] lg:aspect-square bg-gray-100 overflow-hidden shadow-sm group">
-                       <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1200&auto=format&fit=crop" alt="Ar. Abhishek Chandaliya" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 ease-out" />
+                       <img src="./ar.-abhishek-chandaliya.png" alt="Ar. Abhishek Chandaliya" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 ease-out" />
                        <div className="absolute inset-0 border border-black/5 pointer-events-none"></div>
                   </div>
                   <div className="flex flex-col justify-center h-full space-y-10 pt-4">
@@ -390,69 +393,73 @@
       };
 
       /**
-       * ProjectsSection Component
+       * ProjectsSection Component (Rebuilt with 6 Categories & Placeholder Data)
        */
       const ProjectsSection = ({ id }) => {
-        const [activeTab, setActiveTab] = useState('All Works');
+        const [activeTab, setActiveTab] = useState('All');
         const [isExpanded, setIsExpanded] = useState(false);
-        const INITIAL_DISPLAY_COUNT = 15;
+        const INITIAL_DISPLAY_COUNT = 6;
         
         const tabs = [
-          'All Works', 'Luxury Residences', 'Hospitality & Resorts', 'Private Retreats',
-          'Country Estates', 'Housing Developments', 'Township Master Plans',
-          'Commercial Scapes', 'Recreational Hubs', 'Institutional Campuses'
+          'All',
+          'Luxury Residences',
+          'Hospitality',
+          'Private Estates',
+          'Housing & Townships',
+          'Institutional & Commercial',
+          'Terrace & Rooftops'
         ];
 
-        const projectsData = [
-          { id: 13, title: 'Rajasthali Resort', location: 'Jaipur', category: 'Hospitality', subCategory: 'Resort', imgSeed: 113 },
-          { id: 1, title: 'Elysian Heaven', location: 'Jaipur', category: 'Residential', subCategory: 'High-End Residential', imgSeed: 101 },
-          { id: 8, title: 'Fateh Hills', location: 'Jalore', category: 'Township', subCategory: 'Township', imgSeed: 108 },
-          { id: 14, title: 'Nowal Naturecure', location: 'Jaipur', category: 'Hospitality', subCategory: 'Wellness Resort', imgSeed: 114 },
-          { id: 16, title: 'Sand Dunes Resort', location: 'Pushkar', category: 'Hospitality', subCategory: 'Resort', imgSeed: 116 },
-          { id: 10, title: 'Vrindavan Township', location: 'Jaipur', category: 'Township', subCategory: 'Township', imgSeed: 110 },
-          { id: 22, title: 'CLC Campus', location: 'Sikar', category: 'Institutional', subCategory: 'Educational', imgSeed: 122 },
-          { id: 15, title: "Archi's Castle", location: 'Ajmer', category: 'Hospitality', subCategory: 'Resort', imgSeed: 115 },
-          { id: 3, title: 'Opulent Nest', location: 'Jaipur', category: 'Residential', subCategory: 'High-End Residential', imgSeed: 103 },
-          { id: 17, title: 'The Crown', location: 'Jaipur', category: 'Residential', subCategory: 'Group Housing', imgSeed: 117 },
-          { id: 18, title: 'The Crest', location: 'Jaipur', category: 'Residential', subCategory: 'Group Housing', imgSeed: 118 },
-          { id: 2, title: 'Classic Oasis', location: 'Jaipur', category: 'Residential', subCategory: 'Farm House', imgSeed: 102 },
-          { id: 4, title: 'Cultural Elegance', location: 'Bikaner', category: 'Residential', subCategory: 'Farm House', imgSeed: 104 },
-          { id: 5, title: 'Classical Grandeur', location: 'Jaipur', category: 'Residential', subCategory: 'High-End Residential', imgSeed: 105 },
-          { id: 6, title: 'Blossom Ridge', location: 'Jaipur', category: 'Residential', subCategory: 'Out House', imgSeed: 106 },
-          { id: 7, title: 'Regalia Oasis', location: 'Jaipur', category: 'Residential', subCategory: 'Out House', imgSeed: 107 },
-          { id: 19, title: 'Imperial Garden', location: 'Jaipur', category: 'Residential', subCategory: 'Group Housing', imgSeed: 119 },
-          { id: 9, title: 'Navkar City', location: 'Jodhpur', category: 'Township', subCategory: 'Township', imgSeed: 109 },
-          { id: 11, title: 'Samurai Valley', location: 'Jaipur', category: 'Township', subCategory: 'Township', imgSeed: 111 },
-          { id: 12, title: 'Shitla Township', location: 'Jaipur', category: 'Township', subCategory: 'Township', imgSeed: 112 },
-          { id: 20, title: 'Navkar Nilay', location: 'Bhilwara', category: 'Residential', subCategory: 'Group Housing', imgSeed: 120 },
-          { id: 21, title: 'Dev Vidhyalya', location: 'Sikar', category: 'Institutional', subCategory: 'Educational', imgSeed: 121 },
-          { id: 23, title: 'Onir Ceramics', location: 'Jaipur', category: 'Commercial', subCategory: 'Commercial', imgSeed: 123 },
-          { id: 24, title: 'Laxmi Poddar Seva', location: 'Salasar', category: 'Commercial', subCategory: 'Community', imgSeed: 124 },
-        ];
-
-        const filteredProjects = projectsData.filter(project => {
-          switch (activeTab) {
-            case 'All Works': return true;
-            case 'Luxury Residences': return project.subCategory === 'High-End Residential';
-            case 'Hospitality & Resorts': return project.category === 'Hospitality';
-            case 'Private Retreats': return project.subCategory === 'Out House';
-            case 'Country Estates': return project.subCategory === 'Farm House';
-            case 'Housing Developments': return project.subCategory === 'Group Housing';
-            case 'Township Master Plans': return project.category === 'Township';
-            case 'Commercial Scapes': return project.category === 'Commercial' && project.subCategory === 'Commercial';
-            case 'Recreational Hubs': return project.subCategory === 'Community';
-            case 'Institutional Campuses': return project.category === 'Institutional';
-            default: return true;
+        // Fresh placeholder data mapped to the new categories
+        const projectData = [
+          { 
+            title: 'Elysian Villa', 
+            location: 'Jaipur', 
+            category: 'Luxury Residences', 
+            image: 'https://images.unsplash.com/photo-1600596542815-e328701102b9?q=80&w=800&auto=format&fit=crop' 
+          },
+          { 
+            title: 'The Dune Resort', 
+            location: 'Pushkar', 
+            category: 'Hospitality', 
+            image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=800&auto=format&fit=crop' 
+          },
+          { 
+            title: 'Green Valley Estate', 
+            location: 'Udaipur', 
+            category: 'Private Estates', 
+            image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=800&auto=format&fit=crop' 
+          },
+          { 
+            title: 'Skyline Heights', 
+            location: 'Mumbai', 
+            category: 'Housing & Townships', 
+            image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop' 
+          },
+          { 
+            title: 'City Center Plaza', 
+            location: 'Bangalore', 
+            category: 'Institutional & Commercial', 
+            image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop' 
+          },
+          { 
+            title: 'Urban Oasis', 
+            location: 'New Delhi', 
+            category: 'Terrace & Rooftops', 
+            image: 'https://images.unsplash.com/photo-1598337586548-26168537574b?q=80&w=800&auto=format&fit=crop' 
           }
+        ];
+
+        const filteredProjects = projectData.filter(project => {
+          if (activeTab === 'All') return true;
+          return project.category === activeTab;
         });
 
         const displayedProjects = isExpanded ? filteredProjects : filteredProjects.slice(0, INITIAL_DISPLAY_COUNT);
 
-        const getCardStyle = (index, total) => {
-          if (total < 3) return { colSpan: 'col-span-1', aspectRatio: 'aspect-[4/3]', isLarge: false };
-          const positionInCycle = index % 10;
-          const isLarge = positionInCycle === 0 || positionInCycle === 6;
-          return { colSpan: isLarge ? 'md:col-span-2' : 'col-span-1', aspectRatio: isLarge ? 'aspect-[4/3] md:aspect-[2/1]' : 'aspect-[4/3]', isLarge };
+        const getCardStyle = (index) => {
+          // Simplified grid since data is small
+          return { colSpan: 'col-span-1', aspectRatio: 'aspect-[4/3]', isLarge: false };
         };
 
         return (
@@ -464,12 +471,14 @@
                    <span className="text-brand-red uppercase tracking-widest text-sm font-medium">Portfolio</span>
                 </div>
                 <h2 className="text-3xl md:text-5xl font-light text-brand-grey leading-tight">Selected Works</h2>
-                <p className="text-base text-gray-500 font-light max-w-2xl leading-relaxed">A curation of our specialized landscape interventions—from private sanctuaries to master-planned townships. Shaping the void between the built and the biotic.</p>
+                <p className="text-base text-gray-500 font-light max-w-2xl leading-relaxed">A curation of our specialized landscape interventions. Shaping the void between the built and the biotic.</p>
               </div>
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 mb-16 w-full max-w-5xl mx-auto">
+
+              {/* Filters */}
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-4 mb-16 w-full max-w-5xl mx-auto">
                 {tabs.map((tab) => {
                   const isActive = activeTab === tab;
-                  const isAll = tab === 'All Works';
+                  const isAll = tab === 'All';
                   return (
                     <button key={tab} onClick={() => setActiveTab(tab)} className={`relative text-xs md:text-sm uppercase tracking-widest py-2 px-1 transition-all duration-300 ${isActive ? 'text-brand-red font-medium' : isAll ? 'text-brand-grey font-medium' : 'text-brand-grey/50 hover:text-brand-grey font-light'}`}>
                       {tab}
@@ -478,16 +487,18 @@
                   );
                 })}
               </div>
+
+              {/* Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 auto-dense">
                 {displayedProjects.length > 0 ? (
                   displayedProjects.map((project, index) => {
-                    const style = getCardStyle(index, displayedProjects.length);
+                    const style = getCardStyle(index);
                     return (
-                      <div key={project.id} className={`group cursor-pointer flex flex-col fade-in-up ${style.colSpan}`}>
+                      <div key={project.title} className={`group cursor-pointer flex flex-col fade-in-up ${style.colSpan}`}>
                         <div className={`relative overflow-hidden mb-4 bg-gray-100 w-full ${style.aspectRatio}`}>
-                          <img src={`https://picsum.photos/seed/${project.imgSeed}/800/600`} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" loading="lazy" />
+                          <img src={project.image} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" loading="lazy" />
                           <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                          <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-[10px] uppercase tracking-wider text-brand-grey opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">{project.subCategory}</div>
+                          <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-[10px] uppercase tracking-wider text-brand-grey opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">{project.category}</div>
                         </div>
                         <div className="flex justify-between items-start mt-2 px-1">
                           <div>
@@ -502,6 +513,7 @@
                   <div className="col-span-full py-12 text-center text-gray-400 font-light">No projects found in this category.</div>
                 )}
               </div>
+              
               {!isExpanded && filteredProjects.length > INITIAL_DISPLAY_COUNT && (
                 <div className="relative flex justify-center items-center mt-20 w-full">
                   <div className="absolute w-full h-[1px] bg-gray-200"></div>
@@ -589,7 +601,7 @@
       };
 
       /**
-       * CollaborationsSection Component
+       * CollaborationsSection Component (Updated Title & Text)
        */
       const CollaborationsSection = ({ id }) => {
         const partners = [
@@ -602,8 +614,10 @@
           <section id={id} className="py-24 px-6 md:px-12 bg-white w-full border-t border-gray-100">
             <div className="max-w-7xl mx-auto">
               <div className="mb-16 text-center space-y-4">
-                <h2 className="text-3xl md:text-5xl font-light text-brand-grey leading-tight">Integrated Design Alliances</h2>
-                <p className="max-w-2xl mx-auto text-gray-500 font-light leading-relaxed text-base">Collaborating with top-tier architects, designers, and developers to deliver complex master plans, bringing technical rigor and ecological expertise to the table.</p>
+                <h2 className="text-3xl md:text-5xl font-light text-brand-grey leading-tight">Strategic Collaborations</h2>
+                <p className="max-w-2xl mx-auto text-gray-500 font-light leading-relaxed text-base">
+                  Collaborating with top-tier architects, designers, and developers to deliver complex master plans, bringing technical rigor and ecological expertise to the table.
+                </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
                   {partners.map((partner, index) => (
@@ -658,7 +672,6 @@
 
       /**
        * ContactSection Component
-       * CRITICAL UPDATE: Global Elite Standards
        */
       const ContactSection = ({ id }) => {
         return (
@@ -682,7 +695,6 @@
                     <label htmlFor="phone" className="text-xs uppercase tracking-widest text-brand-red font-medium block">Phone</label>
                     <input type="tel" id="phone" className="w-full bg-transparent border-b border-white/20 py-4 text-base md:text-lg font-light focus:outline-none focus:border-white transition-colors placeholder-gray-600 rounded-none" placeholder="+91 00000 00000" />
                   </div>
-                  {/* Fixed Label and Global Elite Options */}
                   <div className="space-y-2">
                      <label htmlFor="projectType" className="text-xs uppercase tracking-widest text-brand-red font-medium block">PROJECT TYPOLOGY</label>
                      <div className="relative">
@@ -704,12 +716,10 @@
                         <ChevronDown size={20} className="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
                      </div>
                   </div>
-                  {/* Refined Micro-Copy */}
                   <div className="space-y-2">
                     <label htmlFor="details" className="text-xs uppercase tracking-widest text-brand-red font-medium block">Project Details</label>
                     <textarea id="details" rows={3} className="w-full bg-transparent border-b border-white/20 py-4 text-base md:text-lg font-light focus:outline-none focus:border-white transition-colors resize-none placeholder-gray-600 rounded-none" placeholder="Briefly describe your site and design aspirations..."></textarea>
                   </div>
-                  {/* Elevated Button Text */}
                   <button type="submit" className="group flex items-center gap-4 text-white pt-6 hover:text-brand-red transition-colors">
                     <span className="uppercase tracking-widest text-sm font-medium">INITIATE DIALOGUE</span>
                     <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform"/>
