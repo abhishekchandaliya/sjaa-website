@@ -413,7 +413,7 @@
         // Fresh placeholder data mapped to the new categories
         const projectData = [
           { 
-            title: 'Elysian Villa', 
+            title: 'Elysian Heaven', 
             location: 'Jaipur', 
             category: 'Luxury Residences', 
             image: 'https://images.unsplash.com/photo-1600596542815-e328701102b9?q=80&w=800&auto=format&fit=crop' 
@@ -425,14 +425,26 @@
             image: './nowal-naturecure/nowal-naturecure (1)' 
           },
           { 
-            title: 'Green Valley Estate', 
-            location: 'Udaipur', 
+            title: 'Nowal Naturecure', 
+            location: 'Badhal', 
+            category: 'Hospitality', 
+            // 1. MAIN COVER IMAGE (Shows on the grid) - Don't forget the .jpg!
+            image: './nowal-naturecure/nowal-naturecure (1).jpg',
+            
+            // 2. NEW GALLERY LIST (Hidden extra photos)
+            gallery: [
+                './nowal-naturecure/nowal-naturecure (2).jpg',
+            ]
+        },
+          { 
+            title: 'Blossom Ridge', 
+            location: 'Jaipur', 
             category: 'Private Estates', 
             image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=800&auto=format&fit=crop' 
           },
           { 
-            title: 'Skyline Heights', 
-            location: 'Mumbai', 
+            title: 'Samurai Valley', 
+            location: 'Jaipur', 
             category: 'Housing & Townships', 
             image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop' 
           },
@@ -922,6 +934,7 @@
     </script>
   </body>
 </html>
+
 
 
 
